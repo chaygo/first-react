@@ -1,67 +1,73 @@
 import { useParams , useHistory } from "react-router-dom";
 import { useState , useEffect } from 'react'
-import useFetch  from "./useFetch";
+import {api} from './api'
+
 const EditBlog = () => {
     const {id} =useParams();
-    const { data : blog, isPending , error , setData} = useFetch('http://localhost:8000/blogs/'+id)
-    const [title,setTitle]=useState('');
-    const [description,setDescription]=useState('');
-    const [author,setAuthor]=useState('');
     const [wait,setWait]=useState(false);
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(false)
     const [blogData, setBlogData] = useState({
         title: "",
         author: "",
         description: "",
-        isLoading: true
     })
     const history=useHistory(); 
 
+    useEffect(() => {
+        api.get(`blogs/${id}`).then(res => {
+            setBlogData({
+                title: res.data.title,
+                description: res.data.description,
+                author: res.data.author,
+            })
+            setLoading(false)
+            setError(false)
+        }).catch(e => {
+            setError(true)
+            console.log(e)
+        })
+    }, [])
+
+const handleChange = (event) => {
+    setBlogData({...blogData, [event.target.name]: event.target.value})
+}
 
     const submitFunction = (e) => {
         e.preventDefault();
-        const newBlog ={ title, description,author};
         setWait(true);
-        fetch('http://localhost:8000/blogs/'+id,{
-            method:'POST',
-            headers : {'Content-Type':'application/json'},
-            body: JSON.stringify(newBlog),
-        }).then(()=>{
+        api.post(`blogs/${id}`, {blogData}).then(()=>{
             setWait(false);
             history.go(-1);
         })
 
     }
-    useEffect(()=>{
-        if (!isPending)
-        {
-            setTitle(blog.title);
-            setDescription(blog.description);
-            setAuthor(blog.author);
-        }
-       
-    })
+    
     return (
         <div>
           
             { error && <div>Error occured </div>}
-            { isPending && <div>Loading...</div>}
-            { blog && 
+            { loading && <div>Loading...</div>}
+            { !loading && 
              <div className="create">
-             <form onSubmit={submitFunction}>
+             <form onSubmit={submitFunction}
+             onChange={handleChange}
+             >
+                
                  <label>Blog title:</label>
                  <input 
                      type="text"
-                     value={title}
-                     onChange={(e)=>setTitle(e.target.value)}
+                     name="title"
+                     value={blogData.title}
                      required />
                  <label>Blog description:</label>
                  <textarea required 
-                 value={description}
-                 onChange={(e)=>setDescription(e.target.value)}
+                 value={blogData.description}
+                 name="description"
                  ></textarea>
                  <label>Blog author :</label>
-                 <select value={author}
-                 onChange={(e)=>setAuthor(e.target.value)}
+                 <select value={blogData.author}
+                 name="author"
                  >
                      <option value="chaygo">Chaygo</option>
                      <option value="morena">Morena</option>
