@@ -1,5 +1,5 @@
 import { useParams , useHistory , Link } from "react-router-dom"
-
+import {api} from './api.js'
 import useFetch from "./useFetch";
 
 const BlogDetail = () =>{
@@ -7,9 +7,7 @@ const BlogDetail = () =>{
     const { data : blog, isPending , error  , setData} = useFetch('http://localhost:8000/blogs/'+id)
     const history=useHistory();
     const deleteButton = () =>{
-        fetch('http://localhost:8000/blogs/'+blog.id,{
-            method:'DELETE',
-        }).then(()=>{
+        api.delete(`blogs/${id}`).then(()=>{
             history.push('/');
         })
     }

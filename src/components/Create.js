@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-
+import {api} from './api'
 const Create = () => {
     const [title,setTitle]=useState('');
     const [description,setDescription]=useState('');
@@ -8,27 +8,43 @@ const Create = () => {
     const [isPending,setIsPending]=useState(false);
     const history=useHistory();
     
-    const submitFunction = (e) =>{
-        e.preventDefault();
-        const newBlog={title,description,author};
-        setIsPending(true);
-        fetch('http://localhost:8000/blogs',{
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify(newBlog)
-        })
-        .then(()=>{
+    // const submitFunction = (e) =>{
+    //     e.preventDefault();
+    //     const newBlog={title,description,author};
+    //     setIsPending(true);
+    //     fetch('http://localhost:8000/blogs',{
+    //         method:'POST',
+    //         headers:{'Content-Type':'application/json'},
+    //         body: JSON.stringify(newBlog)
+    //     })
+    //     .then(()=>{
             
+    //         setIsPending(false);
+    //         setAuthor('chaygo');
+    //         setDescription('');
+    //         setTitle('');
+    //         history.push('/');
+    //     })
+    //     .catch((error)=>{
+    //         console.log(error.message)
+    //     })
+
+    // }
+    const submitFunction = (e) =>{
+
+        e.preventDefault();
+        setIsPending(true);
+        api.post(`blogs`,{title,description,author}).then(res => {
             setIsPending(false);
             setAuthor('chaygo');
             setDescription('');
             setTitle('');
             history.push('/');
+            
+        }).catch(e => {
+            
+            console.log(e.message)
         })
-        .catch((error)=>{
-            console.log(error.message)
-        })
-
     }
 
     return (

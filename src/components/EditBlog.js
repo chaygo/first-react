@@ -21,13 +21,14 @@ const EditBlog = () => {
                 description: res.data.description,
                 author: res.data.author,
             })
+            console.log(blogData);
             setLoading(false)
             setError(false)
         }).catch(e => {
             setError(true)
             console.log(e)
         })
-    }, [])
+    }, [id])
 
 const handleChange = (event) => {
     setBlogData({...blogData, [event.target.name]: event.target.value})
@@ -36,9 +37,12 @@ const handleChange = (event) => {
     const submitFunction = (e) => {
         e.preventDefault();
         setWait(true);
-        api.post(`blogs/${id}`, {blogData}).then(()=>{
+        api.put(`blogs/${id}`, blogData).then(()=>{
             setWait(false);
             history.go(-1);
+        }).catch(e => {
+            
+            console.log(e.message)
         })
 
     }
@@ -58,19 +62,21 @@ const handleChange = (event) => {
                  <input 
                      type="text"
                      name="title"
-                     value={blogData.title}
+                     defaultValue={blogData.title}
+                     
                      required />
                  <label>Blog description:</label>
                  <textarea required 
-                 value={blogData.description}
+                 
+                 defaultValue={blogData.description}
                  name="description"
                  ></textarea>
                  <label>Blog author :</label>
-                 <select value={blogData.author}
+                 <select  defaultValue={blogData.author}
                  name="author"
                  >
-                     <option value="chaygo">Chaygo</option>
-                     <option value="morena">Morena</option>
+                     <option value="Chaygo">Chaygo</option>
+                     <option value="Morena">Morena</option>
                  </select>
                 { !wait && <button >Edit blog</button> }
                 { wait && <button >Editing blog ...</button> }
